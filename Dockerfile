@@ -4,18 +4,25 @@ WORKDIR /app
 
 COPY package.json .
 COPY develop.sh .
-COPY yarn.* .
+COPY yarn.lock .
 
-RUN apt-get update
-
-RUN apt-get install -y python
-
-RUN npm install -g npm@8.19.4
-
-RUN npm install -g @medusajs/medusa-cli@latest
-
-RUN npm install
+RUN yarn --network-timeout 1000000
+RUN yarn global add @medusajs/medusa-cli@latest
+RUN yarn add @medusajs/admin
+#RUN yarn build:admin
 
 COPY . .
 
-ENTRYPOINT ["./develop.sh"]
+ARG JWT_SECRET
+ARG COOKIE_SECRET
+ARG DATABASE_TYPE
+ARG DATABASE_URL
+ARG REDIS_URL
+
+ENV JWT_SECRET ${JWT_SECRET:-something}
+ENV COOKIE_SECRET ${COOKIE_SECRET:-something}
+ENV DATABASE_TYPE ${DATABASE_TYPE:-postgres}
+ENV DATABASE_URL ${DATABASE_URL:-postgres://medusa:medusa@postgres:5432/medusa}
+ENV REDIS_URL ${REDIS_URL:-redis://redis:6379}
+
+ENTRYPOINT ["sh", "./develop.sh"]
