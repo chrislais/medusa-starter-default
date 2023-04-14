@@ -28,25 +28,25 @@ const ADMIN_CORS =
 // CORS to avoid issues when consuming Medusa from a client
 const STORE_CORS = process.env.STORE_CORS || "http://localhost:8000";
 
-const DATABASE_TYPE = process.env.DATABASE_TYPE || "postgres";
-const DATABASE_URL = process.env.DATABASE_URL || "postgres://medusa:medusa@postgres:5432/medusa";
-const REDIS_URL = process.env.REDIS_URL || "redis://redis:6379";
+const DATABASE_TYPE = process.env.DATABASE_TYPE || "sqlite";
+const DATABASE_URL = process.env.DATABASE_URL || "postgres://localhost/medusa-store";
+const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
 
 const plugins = [
   `medusa-fulfillment-manual`,
   `medusa-payment-manual`,
   // To enable the admin plugin, uncomment the following lines and run `yarn add @medusajs/admin`
-  {
-    resolve: "@medusajs/admin",
-    /** @type {import('@medusajs/admin').PluginOptions} */
-    options: {
-      autoRebuild: true,
-    },
-  },
+   {
+     resolve: "@medusajs/admin",
+     /** @type {import('@medusajs/admin').PluginOptions} */
+     options: {
+       autoRebuild: true,
+     },
+   },
 ];
 
 const modules = {
-  /*eventBus: {
+  eventBus: {
     resolve: "@medusajs/event-bus-redis",
     options: {
       redisUrl: REDIS_URL
@@ -57,7 +57,7 @@ const modules = {
     options: {
       redisUrl: REDIS_URL
     }
-  },*/
+  },
 }
 
 /** @type {import('@medusajs/medusa').ConfigModule["projectConfig"]} */
@@ -68,10 +68,8 @@ const projectConfig = {
   database_type: DATABASE_TYPE,
   store_cors: STORE_CORS,
   admin_cors: ADMIN_CORS,
-}
-
-if (REDIS_URL) {
-  projectConfig.redis_url = REDIS_URL;
+  // Uncomment the following lines to enable REDIS
+  redis_url: REDIS_URL
 }
 
 if (DATABASE_URL && DATABASE_TYPE === "postgres") {
@@ -82,13 +80,7 @@ if (DATABASE_URL && DATABASE_TYPE === "postgres") {
 
 /** @type {import('@medusajs/medusa').ConfigModule} */
 module.exports = {
-  projectConfig: {
-    redis_url: REDIS_URL,
-    database_url: DATABASE_URL, //postgres connectionstring
-    database_type: "postgres",
-    store_cors: STORE_CORS,
-    admin_cors: ADMIN_CORS,
-  },
+  projectConfig,
   plugins,
 	modules,
 };
